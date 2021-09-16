@@ -40,7 +40,7 @@ export const tokenDefinitions: StrategyTokenDefinitions = {
 const useStakeSushiToAaveStrategy = (): StrategyHook => {
   const { i18n } = useLingui()
   const { account } = useActiveWeb3React()
-  const balances = useTokenBalances(account, [SUSHI[ChainId.MAINNET], AXSUSHI])
+  const tokenBalances = useTokenBalances(account, [SUSHI[ChainId.MAINNET], AXSUSHI])
   const general = useMemo(() => GENERAL(i18n), [i18n])
   const { setBalances, ...strategy } = useBaseStrategy({
     id: 'stakeSushiToAaveStrategy',
@@ -49,13 +49,11 @@ const useStakeSushiToAaveStrategy = (): StrategyHook => {
   })
 
   useEffect(() => {
-    if (!balances) return
-
     setBalances({
-      inputTokenBalance: balances[SUSHI[ChainId.MAINNET].address],
-      outputTokenBalance: balances[AXSUSHI.address],
+      inputTokenBalance: tokenBalances.mapping[SUSHI[ChainId.MAINNET].address],
+      outputTokenBalance: tokenBalances.mapping[AXSUSHI.address],
     })
-  }, [balances, setBalances])
+  }, [tokenBalances.serialize(), setBalances])
 
   return useMemo(
     () => ({

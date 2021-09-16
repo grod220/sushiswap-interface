@@ -45,7 +45,7 @@ const useStakeSushiToCreamStrategy = (): StrategyHook => {
   const { zapIn, inputValue } = useDerivedInariState()
   const zenkoContract = useZenkoContract()
   const inariContract = useInariContract()
-  const balances = useTokenBalances(account, [SUSHI[ChainId.MAINNET], CRXSUSHI])
+  const tokenBalances = useTokenBalances(account, [SUSHI[ChainId.MAINNET], CRXSUSHI])
   const cTokenAmountRef = useRef<CurrencyAmount<Token>>(null)
   const approveAmount = useMemo(() => (zapIn ? inputValue : cTokenAmountRef.current), [inputValue, zapIn])
 
@@ -83,22 +83,22 @@ const useStakeSushiToCreamStrategy = (): StrategyHook => {
   }, [inputValue, toCTokenAmount])
 
   useEffect(() => {
-    if (!zenkoContract || !balances) return
+    if (!zenkoContract) return
 
     const main = async () => {
-      if (!balances[CRXSUSHI.address]) return tryParseAmount('0', XSUSHI)
+      if (!tokenBalances.mapping[CRXSUSHI.address]) return tryParseAmount('0', XSUSHI)
       const bal = await zenkoContract.fromCtoken(
         CRXSUSHI.address,
-        balances[CRXSUSHI.address].toFixed().toBigNumber(CRXSUSHI.decimals).toString()
+        tokenBalances.mapping[CRXSUSHI.address].toFixed().toBigNumber(CRXSUSHI.decimals).toString()
       )
       setBalances({
-        inputTokenBalance: balances[SUSHI[ChainId.MAINNET].address],
+        inputTokenBalance: tokenBalances.mapping[SUSHI[ChainId.MAINNET].address],
         outputTokenBalance: CurrencyAmount.fromRawAmount(XSUSHI, bal.toString()),
       })
     }
 
     main()
-  }, [balances, setBalances, zenkoContract])
+  }, [tokenBalances.serialize(), setBalances, zenkoContract])
 
   return useMemo(
     () => ({

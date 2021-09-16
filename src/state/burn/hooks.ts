@@ -39,8 +39,8 @@ export function useDerivedBurnInfo(
   const [, pair] = useV2Pair(currencyA, currencyB)
 
   // balances
-  const relevantTokenBalances = useTokenBalances(account ?? undefined, [pair?.liquidityToken])
-  const userLiquidity: undefined | CurrencyAmount<Token> = relevantTokenBalances?.[pair?.liquidityToken?.address ?? '']
+  const { mapping } = useTokenBalances(account ?? undefined, [pair?.liquidityToken])
+  const userLiquidity: undefined | CurrencyAmount<Token> = mapping[pair?.liquidityToken?.address ?? '']
 
   const [tokenA, tokenB] = [currencyA?.wrapped, currencyB?.wrapped]
   const tokens = {

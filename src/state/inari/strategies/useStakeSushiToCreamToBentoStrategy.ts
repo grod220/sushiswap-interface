@@ -44,7 +44,7 @@ const useStakeSushiToCreamToBentoStrategy = (): StrategyHook => {
   const { i18n } = useLingui()
   const { account } = useActiveWeb3React()
   const zenkoContract = useZenkoContract()
-  const balances = useTokenBalances(account, [SUSHI[ChainId.MAINNET]])
+  const tokenBalances = useTokenBalances(account, [SUSHI[ChainId.MAINNET]])
   const sushiPerXSushi = useSushiPerXSushi(true)
   const crxSushiBentoBalance = useBentoBalance(CRXSUSHI.address)
 
@@ -60,13 +60,11 @@ const useStakeSushiToCreamToBentoStrategy = (): StrategyHook => {
   const { setBalances, calculateOutputFromInput: _, ...strategy } = useBentoBoxTrait(baseStrategy)
 
   useEffect(() => {
-    if (!balances) return
-
     setBalances({
-      inputTokenBalance: balances[SUSHI[ChainId.MAINNET].address],
+      inputTokenBalance: tokenBalances.mapping[SUSHI[ChainId.MAINNET].address],
       outputTokenBalance: tryParseAmount(crxSushiBentoBalance?.value?.toFixed(8) || '0', CRXSUSHI),
     })
-  }, [balances, setBalances, crxSushiBentoBalance?.value])
+  }, [tokenBalances.serialize(), setBalances, crxSushiBentoBalance?.value])
 
   const calculateOutputFromInput = useCallback(
     async (zapIn: boolean, inputValue: string, inputToken: Token, outputToken: Token) => {

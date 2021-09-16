@@ -43,7 +43,7 @@ export const tokenDefinitions: StrategyTokenDefinitions = {
 const useStakeSushiToBentoStrategy = (): StrategyHook => {
   const { i18n } = useLingui()
   const { account } = useActiveWeb3React()
-  const balances = useTokenBalances(account, [SUSHI[ChainId.MAINNET], XSUSHI])
+  const tokenBalances = useTokenBalances(account, [SUSHI[ChainId.MAINNET], XSUSHI])
   const xSushiBentoBalance = useBentoBalance(XSUSHI.address)
 
   // Strategy ends in BentoBox so use BaseBentoBox strategy
@@ -58,13 +58,11 @@ const useStakeSushiToBentoStrategy = (): StrategyHook => {
   const { setBalances, ...strategy } = useBentoBoxTrait(baseStrategy)
 
   useEffect(() => {
-    if (!balances) return
-
     setBalances({
-      inputTokenBalance: balances[SUSHI[ChainId.MAINNET].address],
+      inputTokenBalance: tokenBalances.mapping[SUSHI[ChainId.MAINNET].address],
       outputTokenBalance: tryParseAmount(xSushiBentoBalance?.value?.toFixed(18) || '0', XSUSHI),
     })
-  }, [balances, setBalances, xSushiBentoBalance?.value])
+  }, [tokenBalances.serialize(), setBalances, xSushiBentoBalance?.value])
 
   return useMemo(
     () => ({
